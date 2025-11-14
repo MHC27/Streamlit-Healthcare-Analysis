@@ -118,8 +118,8 @@ with col8:
                               title="Heatmap: Medications vs Lab Procedures", nbinsx=20, nbinsy=20)
     st.plotly_chart(fig8, use_container_width=True)
 
-# ------------------------- Enhanced Moving Bubble Chart -------------------------
-st.subheader("🌈 Moving Bubble Chart — Enhanced and Dynamic")
+# ------------------------- Enhanced Auto-Playing Bubble Chart -------------------------
+st.subheader("🌈 Moving Bubble Chart — Auto Dynamic Playback")
 
 bubble_df = (
     df_filtered
@@ -133,10 +133,11 @@ bubble_df = (
     .reset_index()
 )
 
-# 🔧 Fix NaN values for bubble size and coordinates
+# Clean NaN values
 bubble_df = bubble_df.dropna(subset=["number_inpatient", "num_medications", "num_lab_procedures"])
 bubble_df["number_inpatient"] = bubble_df["number_inpatient"].fillna(bubble_df["number_inpatient"].median())
 
+# Create figure
 fig_bubble = px.scatter(
     bubble_df,
     x="num_medications",
@@ -149,11 +150,27 @@ fig_bubble = px.scatter(
     size_max=50,
     range_x=[0, bubble_df["num_medications"].max() + 5],
     range_y=[0, bubble_df["num_lab_procedures"].max() + 5],
-    title="Bubble Chart: Medications vs Lab Procedures Over Hospital Stay Duration"
+    title="Dynamic Bubble Chart: Medications vs Lab Procedures Over Hospital Stay Duration"
 )
 
+# Improve visuals
 fig_bubble.update_traces(marker=dict(opacity=0.8, line=dict(width=1, color="DarkSlateGrey")))
-fig_bubble.update_layout(transition={'duration': 1000, 'easing': 'cubic-in-out'}, showlegend=True)
+fig_bubble.update_layout(
+    transition={'duration': 800, 'easing': 'cubic-in-out'},
+    showlegend=True,
+)
+
+# 🔁 Auto-play animation without user input
+fig_bubble.layout.updatemenus[0].buttons[0].args[1]["frame"]["duration"] = 800
+fig_bubble.layout.updatemenus[0].buttons[0].args[1]["transition"]["duration"] = 500
+
+# Loop animation automatically (simulate infinite playback)
+fig_bubble.layout.updatemenus[0].buttons[0].args[1]["mode"] = "immediate"
+fig_bubble.layout.updatemenus[0].buttons[0].args[1]["fromcurrent"] = True
+
+# Set autoplay and looping
+fig_bubble.layout.updatemenus[0].buttons[0].args[1]["repeat"] = True
+fig_bubble.layout.updatemenus[0].showactive = False
 
 st.plotly_chart(fig_bubble, use_container_width=True)
 
